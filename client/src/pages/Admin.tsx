@@ -13,14 +13,14 @@ import moment from 'moment';
 
 export default function Admin() {
     const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState<'stats' | 'products' | 'users' | 'reports' | 'backgrounds' | 'categories' | 'orders' | 'settings' | 'withdrawals'>('stats');
+    const [activeTab, setActiveTab] = useState<'stats' | 'products' | 'users' | 'reports' | 'backgrounds' | 'categories' | 'orders' | 'settings'>('stats');
     const [stats, setStats] = useState<any>(null);
     const [dataList, setDataList] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Settings state
-    const [siteName, setSiteName] = useState('PassUp');
-    const [siteSlogan, setSiteSlogan] = useState('Second-hand Marketplace');
+    // System States
+    const [maintenanceMode, setMaintenanceMode] = useState(false);
+    const [allowReg, setAllowReg] = useState(true);
 
     // Form cho backgrounds
     const [newOption, setNewOption] = useState({ name: '', value: '', type: 'COLOR' });
@@ -74,8 +74,8 @@ export default function Admin() {
             } else if (activeTab === 'settings') {
                 const res = await api.get('/settings');
                 const s = res.data.data;
-                setSiteName(s.SITE_NAME || 'PassUp');
-                setSiteSlogan(s.SITE_SLOGAN || 'Second-hand Marketplace');
+                setMaintenanceMode(s.MAINTENANCE_MODE === 'true');
+                setAllowReg(s.ALLOW_REGISTRATION !== 'false');
             }
         } catch (err) {
             console.error('Lỗi lấy dữ liệu admin:', err);
@@ -197,14 +197,6 @@ export default function Admin() {
         }
     };
 
-    const handleUpdateWithdrawal = async (id: number, status: string) => {
-        try {
-            await api.put(`/admin/withdrawals/${id}`, { status });
-            fetchData();
-        } catch (err) {
-            toast.error('Lỗi xử lý yêu cầu rút tiền');
-        }
-    };
 
     const handleUpdateOrderAdmin = async (id: number, status: string) => {
         try {
@@ -257,7 +249,6 @@ export default function Admin() {
         if (activeTab === 'products') return item.title?.toLowerCase().includes(s) || item.seller?.fullName?.toLowerCase().includes(s);
         if (activeTab === 'orders') return item.id.toString().includes(s) || item.buyer?.fullName?.toLowerCase().includes(s) || item.product?.title?.toLowerCase().includes(s);
         if (activeTab === 'reports') return item.reason?.toLowerCase().includes(s) || item.description?.toLowerCase().includes(s);
-        if (activeTab === 'withdrawals') return item.user?.fullName?.toLowerCase().includes(s) || item.amount?.toString().includes(s);
         return true;
     }) : [];
 
@@ -528,7 +519,7 @@ export default function Admin() {
                     <div className="space-y-6">
                         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <h1 className="text-3xl font-black text-slate-900 capitalize text-left">
-                                {activeTab === 'reports' ? 'Báo cáo vi phạm' : activeTab === 'products' ? 'Sản phẩm' : activeTab === 'users' ? 'Người dùng' : activeTab === 'orders' ? 'Tất cả Đơn hàng' : 'Yêu cầu rút tiền'}
+                                {activeTab === 'reports' ? 'Báo cáo vi phạm' : activeTab === 'products' ? 'Sản phẩm' : activeTab === 'users' ? 'Người dùng' : activeTab === 'orders' ? 'Tất cả Đơn hàng' : ''}
                             </h1>
                             <div className="flex gap-3 w-full md:w-auto">
                                 <div className="relative flex-grow md:w-64">
@@ -732,22 +723,6 @@ export default function Admin() {
                                                             </button>
                                                         </div>
                                                     )}
-                                                    {activeTab === 'withdrawals' && item.status === 'PENDING' && (
-                                                        <div className="flex justify-end gap-2">
-                                                            <button 
-                                                                onClick={() => handleUpdateWithdrawal(item.id, 'APPROVED')}
-                                                                className="px-3 py-1 bg-emerald-600 text-white rounded-lg text-[10px] font-black uppercase hover:bg-emerald-700"
-                                                            >
-                                                                DUYỆT CHI
-                                                            </button>
-                                                            <button 
-                                                                onClick={() => handleUpdateWithdrawal(item.id, 'REJECTED')}
-                                                                className="px-3 py-1 bg-rose-600 text-white rounded-lg text-[10px] font-black uppercase hover:bg-rose-700"
-                                                            >
-                                                                TỪ CHỐI
-                                                            </button>
-                                                        </div>
-                                                    )}
                                                     {activeTab === 'orders' && (
                                                         <div className="flex justify-end gap-2 text-xs font-bold text-slate-400">
                                                             Quản trị viên có quyền ghi đè trạng thái
@@ -775,41 +750,6 @@ export default function Admin() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
                                 <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
-                                    <ShieldCheck className="w-5 h-5 text-blue-600" /> Nhận diện thương hiệu
-                                </h3>
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Tên Website</label>
-                                        <input 
-                                            type="text" 
-                                            value={siteName} 
-                                            onChange={(e) => setSiteName(e.target.value)}
-                                            className="w-full p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-blue-500" 
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Slogan</label>
-                                        <input 
-                                            type="text" 
-                                            value={siteSlogan} 
-                                            onChange={(e) => setSiteSlogan(e.target.value)}
-                                            className="w-full p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-blue-500" 
-                                        />
-                                    </div>
-                                </div>
-                                <button 
-                                    onClick={() => {
-                                        handleUpdateSetting('SITE_NAME', siteName);
-                                        handleUpdateSetting('SITE_SLOGAN', siteSlogan);
-                                    }}
-                                    className="w-full py-3 bg-blue-600 text-white font-black rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
-                                >
-                                    CẬP NHẬT CẤU HÌNH
-                                </button>
-                            </div>
-
-                            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
-                                <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
                                     <AlertTriangle className="w-5 h-5 text-orange-500" /> Trạng thái hệ thống
                                 </h3>
                                 <div className="space-y-4">
@@ -818,41 +758,35 @@ export default function Admin() {
                                             <div className="font-bold text-slate-900">Chế độ bảo trì</div>
                                             <div className="text-xs text-slate-400">Tạm khóa toàn bộ website</div>
                                         </div>
-                                        <div className="w-12 h-6 bg-slate-300 rounded-full relative cursor-pointer">
-                                            <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full"></div>
-                                        </div>
+                                        <button 
+                                            onClick={() => {
+                                                const newVal = !maintenanceMode;
+                                                setMaintenanceMode(newVal);
+                                                handleUpdateSetting('MAINTENANCE_MODE', String(newVal));
+                                            }}
+                                            className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${maintenanceMode ? 'bg-orange-500' : 'bg-slate-300'}`}
+                                        >
+                                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${maintenanceMode ? 'right-1' : 'left-1'}`}></div>
+                                        </button>
                                     </div>
                                     <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
                                         <div>
                                             <div className="font-bold text-slate-900">Đăng ký người dùng</div>
                                             <div className="text-xs text-slate-400">Cho phép người dùng mới đăng ký</div>
                                         </div>
-                                        <div className="w-12 h-6 bg-emerald-500 rounded-full relative cursor-pointer">
-                                            <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
-                                        </div>
+                                        <button 
+                                            onClick={() => {
+                                                const newVal = !allowReg;
+                                                setAllowReg(newVal);
+                                                handleUpdateSetting('ALLOW_REGISTRATION', String(newVal));
+                                            }}
+                                            className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${allowReg ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                                        >
+                                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${allowReg ? 'right-1' : 'left-1'}`}></div>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
-                            <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
-                                <ShoppingCart className="w-5 h-5 text-indigo-500" /> Chính sách sàn
-                            </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Phí hoa hồng (%)</label>
-                                    <input type="number" defaultValue={5} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-indigo-500" />
-                                </div>
-                                <div>
-                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1 block">Tối thiểu rút tiền</label>
-                                    <div className="text-xs text-slate-400 mb-2 italic">Số dư tối thiểu để tạo yêu cầu rút tiền</div>
-                                    <input type="number" defaultValue={100000} className="w-full p-3 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:border-indigo-500" />
-                                </div>
-                            </div>
-                            <button className="px-10 py-3 bg-indigo-600 text-white font-black rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
-                                LƯU CHÍNH SÁCH
-                            </button>
                         </div>
                     </div>
                 )}

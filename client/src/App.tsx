@@ -87,17 +87,32 @@ function App() {
           {user ? (
             <>
               {user.role === 'ADMIN' && (
-                <Link to="/admin" className="hidden lg:flex items-center gap-2 text-red-500 font-black text-xs uppercase tracking-widest hover:bg-red-50 px-3 py-2 rounded-xl transition-all">
+                <Link to="/admin" className="hidden 2xl:flex items-center gap-2 text-red-500 font-black text-xs uppercase tracking-widest hover:bg-red-50 px-3 py-2 rounded-xl transition-all">
                     <ShieldCheck className="w-4 h-4" />
                     Quản trị
                 </Link>
               )}
+
+              <div className="hidden lg:flex items-center gap-0.5 mr-2">
+                 <Link to="/chat" className="px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition-all font-bold text-xs flex items-center gap-1.5">
+                    <MessageSquare className="w-4 h-4" /> Tin nhắn
+                 </Link>
+                 <Link to="/my-products" className="px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition-all font-bold text-xs flex items-center gap-1.5">
+                    <Package className="w-4 h-4" /> Tin đăng
+                 </Link>
+                 <Link to="/orders" className="px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition-all font-bold text-xs flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4" /> Đơn hàng
+                 </Link>
+                 <Link to="/wishlist" className="px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition-all font-bold text-xs flex items-center gap-1.5">
+                    <Heart className="w-4 h-4" /> Yêu thích
+                 </Link>
+              </div>
               
-              <Link to="/sell" className="btn-primary py-2.5 px-6 text-sm bg-blue-600 hover:bg-blue-700 shadow-blue-500/20 font-black border-none rounded-xl hidden md:flex items-center gap-2">
+              <Link to="/sell" className="btn-primary py-2.5 px-6 text-sm bg-blue-600 hover:bg-blue-700 shadow-blue-500/20 font-black border-none rounded-xl hidden sm:flex items-center gap-2">
                 ĐĂNG BÁN
               </Link>
 
-              <div className="flex items-center gap-1 md:gap-3 ml-2 border-l border-slate-100 pl-4">
+              <div className="flex items-center gap-1 md:gap-3 ml-1 md:ml-2 border-l border-slate-100 pl-2 md:pl-4">
                   <NotificationBell />
                   
                   {/* User Dropdown */}
@@ -137,7 +152,7 @@ function App() {
                                    <Link to="/change-password" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-amber-600 transition-all font-bold text-sm">
                                        <Key className="w-4 h-4" /> Đổi mật khẩu
                                    </Link>
-                                   <div className="md:hidden">
+                                   <div className="sm:hidden">
                                        <Link to="/sell" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all font-bold text-sm">
                                            <Zap className="w-4 h-4" /> Nạp lượt & Đăng tin
                                        </Link>
@@ -147,13 +162,13 @@ function App() {
                                        <MessageSquare className="w-4 h-4" /> Tin nhắn
                                    </Link>
                                    <Link to="/my-products" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 transition-all font-bold text-sm">
-                                       <Package className="w-4 h-4" /> Quản lý tin đăng
+                                       <Package className="w-4 h-4" /> Tin đăng
                                    </Link>
                                    <Link to="/orders" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 transition-all font-bold text-sm">
-                                       <ShieldCheck className="w-4 h-4" /> Lịch sử đơn hàng
+                                       <ShieldCheck className="w-4 h-4" /> Đơn hàng
                                    </Link>
                                    <Link to="/wishlist" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 transition-all font-bold text-sm">
-                                       <Heart className="w-4 h-4" /> Đã yêu thích
+                                       <Heart className="w-4 h-4" /> Yêu thích
                                    </Link>
                                    <hr className="my-2 border-slate-50 mx-4" />
                                    <button 
