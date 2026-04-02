@@ -3,7 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { getSocket } from '../services/socket';
-import { Send, Image, MessageSquare, ChevronLeft, User, Loader2, CheckCircle, Plus, ShoppingBag, ExternalLink } from 'lucide-react';
+import { Send, Image, MessageSquare, ChevronLeft, Loader2, CheckCircle, ShoppingBag, ExternalLink } from 'lucide-react';
 import moment from 'moment';
 
 export default function Chat() {

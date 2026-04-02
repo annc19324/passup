@@ -24,7 +24,6 @@ export default function Profile() {
     });
 
     const [districts, setDistricts] = useState<any[]>([]);
-    const [wards, setWards] = useState<string[]>([]);
 
     const fetchUserData = () => {
         api.get('/users/me')
@@ -46,8 +45,6 @@ export default function Profile() {
                         const prov = VIETNAM_PROVINCES.find(p => p.name === u.province);
                         if (prov) {
                             setDistricts(prov.districts);
-                            const dist = prov.districts.find((d: any) => d.name === u.district);
-                            if (dist) setWards(dist.wards);
                         }
                     }
                 }
@@ -81,14 +78,12 @@ export default function Profile() {
         const provinceName = e.target.value;
         const prov = VIETNAM_PROVINCES.find(p => p.name === provinceName);
         setForm({ ...form, province: provinceName, district: '', ward: '' });
-        setDistricts(prov ? prov.districts : []); setWards([]);
+        setDistricts(prov ? prov.districts : []);
     };
 
     const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const districtName = e.target.value;
-        const dist = districts.find(d => d.name === districtName);
         setForm({ ...form, district: districtName, ward: '' });
-        setWards(dist ? dist.wards : []);
     };
 
     const handleUpdate = async (e: React.FormEvent) => {

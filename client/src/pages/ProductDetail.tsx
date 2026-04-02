@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import moment from 'moment';
+// @ts-ignore
 import 'moment/locale/vi';
 import { toast } from 'react-hot-toast';
 import { MapPin, Clock, ShieldCheck, Tag, MessageCircle, Loader2, Heart, AlertTriangle, Edit2, Zap, Package } from 'lucide-react';

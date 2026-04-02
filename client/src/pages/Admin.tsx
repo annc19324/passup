@@ -607,7 +607,7 @@ export default function Admin() {
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                    ) : activeTab === 'withdrawals' ? (
+                                                    ) : false ? (
                                                         <div className="text-left">
                                                             <div className="font-bold text-slate-900">{item.user?.fullName}</div>
                                                             <div className="text-xs text-slate-500">{item.user?.email}</div>

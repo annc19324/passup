@@ -1,4 +1,4 @@
-import { Home, Heart, PlusCircle, MessageCircle, User, Zap } from 'lucide-react';
+import { Home, PlusCircle, MessageCircle, User, Zap } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 

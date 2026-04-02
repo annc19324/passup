@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+// @ts-ignore
 import 'moment/locale/vi';
 
 moment.locale('vi');
