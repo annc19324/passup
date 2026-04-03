@@ -8,10 +8,10 @@ export const getAllCategories = async (admin: boolean = false) => {
     });
 };
 
-export const createCategory = async (name: string) => {
+export const createCategory = async (name: string, icon?: string) => {
     const slug = slugify(name, { lower: true, locale: 'vi' });
     return await prisma.category.create({
-        data: { name, slug }
+        data: { name, slug, icon } as any
     });
 };
 

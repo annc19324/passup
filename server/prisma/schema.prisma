@@ -102,6 +102,7 @@ model Category {
   name      String    @unique
   slug      String    @unique
   isActive  Boolean   @default(true)
+  icon      String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   products  Product[]

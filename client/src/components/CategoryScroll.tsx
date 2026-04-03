@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
-import { LayoutGrid, Monitor, Smartphone, BookOpen, Shirt, Armchair, Bike } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 
 interface Category {
     id: number;
     name: string;
     slug: string;
     isActive: boolean;
+    icon?: string;
 }
 
 interface CategoryScrollProps {
@@ -14,16 +15,26 @@ interface CategoryScrollProps {
     activeCategoryId: number | null;
 }
 
-const mapIconToCategory = (slug: string) => {
+const mapIconToCategory = (iconPath: string | undefined, slug: string) => {
+    if (iconPath && iconPath.startsWith('http')) {
+        return <img src={iconPath} alt="" className="w-8 h-8 object-contain" />;
+    }
+
+    if (iconPath) {
+        const IconComponent = (LucideIcons as any)[iconPath];
+        if (IconComponent) return <IconComponent className="w-8 h-8 opacity-80" />;
+    }
+
+    // Fallback based on slug
     switch (slug) {
         case 'do-0-dong': return <span className="text-xl font-black">0đ</span>;
-        case 'do-dien-tu': return <Monitor className="w-8 h-8 opacity-80" />;
-        case 'dien-thoai': return <Smartphone className="w-8 h-8 opacity-80" />;
-        case 'sach-giao-trinh': return <BookOpen className="w-8 h-8 opacity-80" />;
-        case 'thoi-trang': return <Shirt className="w-8 h-8 opacity-80" />;
-        case 'noi-that': return <Armchair className="w-8 h-8 opacity-80" />;
-        case 'phuong-tien': return <Bike className="w-8 h-8 opacity-80" />;
-        default: return <LayoutGrid className="w-8 h-8 opacity-80" />;
+        case 'do-dien-tu': return <LucideIcons.Monitor className="w-8 h-8 opacity-80" />;
+        case 'dien-thoai': return <LucideIcons.Smartphone className="w-8 h-8 opacity-80" />;
+        case 'sach-giao-trinh': return <LucideIcons.BookOpen className="w-8 h-8 opacity-80" />;
+        case 'thoi-trang': return <LucideIcons.Shirt className="w-8 h-8 opacity-80" />;
+        case 'noi-that': return <LucideIcons.Armchair className="w-8 h-8 opacity-80" />;
+        case 'phuong-tien': return <LucideIcons.Bike className="w-8 h-8 opacity-80" />;
+        default: return <LucideIcons.LayoutGrid className="w-8 h-8 opacity-80" />;
     }
 }
 
@@ -73,7 +84,7 @@ export default function CategoryScroll({ onSelectCategory, activeCategoryId }: C
                     className="group flex flex-col items-center gap-3 min-w-[80px] cursor-pointer"
                 >
                     <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-sm ${activeCategoryId === null ? 'bg-blue-600 text-white shadow-blue-200 scale-105' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
-                        <LayoutGrid className="w-8 h-8 opacity-80" />
+                        <LucideIcons.LayoutGrid className="w-8 h-8 opacity-80" />
                     </div>
                     <span className={`text-sm font-medium transition-colors ${activeCategoryId === null ? 'text-blue-600 font-bold' : 'text-slate-600 group-hover:text-blue-600'}`}>
                         Tất cả
@@ -96,7 +107,7 @@ export default function CategoryScroll({ onSelectCategory, activeCategoryId }: C
                             className="group flex flex-col items-center gap-3 min-w-[80px] cursor-pointer"
                         >
                             <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-sm ${isActive ? 'bg-blue-600 text-white shadow-blue-200 scale-105' : `${colorClass} hover:opacity-80`}`}>
-                                {mapIconToCategory(cat.slug)}
+                                {mapIconToCategory(cat.icon, cat.slug)}
                             </div>
                             <span className={`text-sm font-medium transition-colors ${isActive ? 'text-blue-600 font-bold' : (isFree ? 'text-red-600 group-hover:text-red-700 font-black' : 'text-slate-600 group-hover:text-blue-600')}`}>
                                 {isFree ? 'Free' : cat.name}

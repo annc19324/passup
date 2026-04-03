@@ -29,6 +29,8 @@ export default function Admin() {
 
     // Form cho Categories
     const [newCatName, setNewCatName] = useState('');
+    const [newCatIcon, setNewCatIcon] = useState('');
+    const [catFile, setCatFile] = useState<File | null>(null);
 
     // User Edit Modal
     const [editingUser, setEditingUser] = useState<any>(null);
@@ -159,9 +161,22 @@ export default function Admin() {
     const handleAddCategory = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await api.post('/categories', { name: newCatName });
+            const formData = new FormData();
+            formData.append('name', newCatName);
+            if (catFile) {
+                formData.append('icon', catFile);
+            } else if (newCatIcon) {
+                formData.append('icon', newCatIcon);
+            }
+
+            await api.post('/categories', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             setNewCatName('');
+            setNewCatIcon('');
+            setCatFile(null);
             fetchData();
+            toast.success('Đã thêm danh mục mới');
         } catch (err) {
             toast.error('Lỗi thêm danh mục');
         }
@@ -332,19 +347,37 @@ export default function Admin() {
                             <p className="text-slate-500 font-medium">Thêm, sửa hoặc ẩn các danh mục sản phẩm trên sàn.</p>
                         </header>
 
-                        <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm max-w-md text-left">
-                            <h3 className="text-lg font-black text-slate-800 mb-4">Thêm danh mục mới</h3>
-                            <form onSubmit={handleAddCategory} className="flex gap-2">
-                                <input 
-                                    type="text" 
-                                    required
-                                    placeholder="Tên danh mục (ví dụ: Đồ gia dụng)"
-                                    value={newCatName}
-                                    onChange={(e) => setNewCatName(e.target.value)}
-                                    className="flex-grow p-3 bg-slate-50 rounded-xl outline-none border border-slate-100 focus:border-blue-500 transition-all"
-                                />
-                                <button className="p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all">
-                                    <Plus className="w-6 h-6" />
+                        <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm text-left">
+                            <h3 className="text-lg font-black text-slate-800 mb-4 px-2 uppercase tracking-widest">Thêm danh mục mới</h3>
+                            <form onSubmit={handleAddCategory} className="flex flex-col md:flex-row gap-4">
+                                <div className="flex-grow space-y-4">
+                                    <input 
+                                        type="text" 
+                                        required
+                                        placeholder="Tên danh mục (ví dụ: Đồ gia dụng)"
+                                        value={newCatName}
+                                        onChange={(e) => setNewCatName(e.target.value)}
+                                        className="w-full p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500 transition-all font-bold"
+                                    />
+                                    <div className="flex gap-4">
+                                        <input 
+                                            type="text" 
+                                            placeholder="Icon (Tên Lucide: Car, Shirt...)"
+                                            value={newCatIcon}
+                                            onChange={(e) => setNewCatIcon(e.target.value)}
+                                            className="flex-grow p-4 bg-slate-50 rounded-2xl outline-none border border-transparent focus:border-blue-500 transition-all text-sm font-medium"
+                                        />
+                                        <label className="p-4 bg-blue-50 text-blue-600 rounded-2xl border border-blue-100 cursor-pointer hover:bg-blue-100 transition-all flex items-center gap-2 font-bold text-xs whitespace-nowrap">
+                                            <ImageIcon className="w-4 h-4" /> {catFile ? 'Đã chọn ảnh' : 'Tải lên icon'}
+                                            <input type="file" className="hidden" accept="image/*" onChange={(e) => setCatFile(e.target.files?.[0] || null)} />
+                                        </label>
+                                    </div>
+                                </div>
+                                <button 
+                                    type="submit" 
+                                    className="px-10 bg-slate-900 text-white font-black rounded-[2rem] shadow-xl shadow-slate-200 hover:bg-blue-600 transition-all text-sm uppercase tracking-widest self-stretch md:w-40 flex items-center justify-center"
+                                >
+                                    Thêm mới
                                 </button>
                             </form>
                         </div>
@@ -353,7 +386,8 @@ export default function Admin() {
                             <table className="w-full text-left border-collapse">
                                 <thead className="bg-slate-50 border-b border-slate-100">
                                     <tr>
-                                        <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">ID</th>
+                                        <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">ID</th>
+                                        <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Icon</th>
                                         <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Tên danh mục</th>
                                         <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Slug (SEO)</th>
                                         <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Trạng thái</th>
@@ -364,6 +398,15 @@ export default function Admin() {
                                     {dataList.map((cat: any) => (
                                         <tr key={cat.id} className="hover:bg-slate-50/50 transition-colors">
                                             <td className="px-6 py-4 text-sm font-bold text-slate-400">#{cat.id}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden">
+                                                    {cat.icon && cat.icon.startsWith('http') ? (
+                                                        <img src={cat.icon} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span className="text-slate-400 italic text-[10px]">None</span>
+                                                    )}
+                                                </div>
+                                            </td>
                                             <td className="px-6 py-4 font-bold text-slate-900">{cat.name}</td>
                                             <td className="px-6 py-4 text-xs font-mono text-slate-500">{cat.slug}</td>
                                             <td className="px-6 py-4">
