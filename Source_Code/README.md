@@ -66,74 +66,108 @@
 
 ```
 PassUp/
-├── client/                          # Frontend (React + Vite)
+├── client/                              # Frontend (React + Vite)
 │   ├── src/
-│   │   ├── pages/                   # 16 trang giao diện
-│   │   │   ├── Home.tsx             # Trang chủ, danh sách sản phẩm
-│   │   │   ├── Login.tsx            # Đăng nhập
-│   │   │   ├── Register.tsx         # Đăng ký
-│   │   │   ├── Sell.tsx             # Đăng tin bán hàng
-│   │   │   ├── ProductDetail.tsx    # Chi tiết sản phẩm
-│   │   │   ├── Chat.tsx             # Nhắn tin thời gian thực
-│   │   │   ├── Orders.tsx           # Quản lý đơn hàng
-│   │   │   ├── Pricing.tsx          # Gói đẩy tin / Thanh toán
-│   │   │   ├── Profile.tsx          # Trang cá nhân
-│   │   │   ├── MyProducts.tsx       # Quản lý tin đăng cá nhân
-│   │   │   ├── Wishlist.tsx         # Danh sách yêu thích
-│   │   │   ├── Admin.tsx            # Dashboard quản trị
-│   │   │   ├── EditProduct.tsx      # Chỉnh sửa sản phẩm
-│   │   │   ├── SellerProfile.tsx    # Trang người bán
-│   │   │   ├── ChangePassword.tsx   # Đổi mật khẩu
-│   │   │   └── ForgotPassword.tsx   # Quên mật khẩu
-│   │   ├── components/              # Component tái sử dụng
-│   │   ├── context/                 # React Context (Auth, Socket)
-│   │   ├── hooks/                   # Custom hooks
-│   │   ├── services/                # API service calls (Axios)
-│   │   ├── types/                   # TypeScript type definitions
-│   │   ├── layouts/                 # Layout components
-│   │   └── App.tsx                  # Root component + Router
+│   │   ├── pages/                       # 16 trang giao diện
+│   │   │   ├── Home.tsx                 # Trang chủ, danh sách sản phẩm
+│   │   │   ├── Login.tsx                # Đăng nhập
+│   │   │   ├── Register.tsx             # Đăng ký
+│   │   │   ├── Sell.tsx                 # Đăng tin bán hàng
+│   │   │   ├── ProductDetail.tsx        # Chi tiết sản phẩm
+│   │   │   ├── Chat.tsx                 # Nhắn tin thời gian thực
+│   │   │   ├── Orders.tsx               # Quản lý đơn hàng
+│   │   │   ├── Pricing.tsx              # Gói đẩy tin / Thanh toán
+│   │   │   ├── Profile.tsx              # Trang cá nhân
+│   │   │   ├── MyProducts.tsx           # Quản lý tin đăng cá nhân
+│   │   │   ├── Wishlist.tsx             # Danh sách yêu thích
+│   │   │   ├── Admin.tsx                # Dashboard quản trị
+│   │   │   ├── EditProduct.tsx          # Chỉnh sửa sản phẩm
+│   │   │   ├── SellerProfile.tsx        # Trang người bán
+│   │   │   ├── ChangePassword.tsx       # Đổi mật khẩu
+│   │   │   └── ForgotPassword.tsx       # Quên mật khẩu
+│   │   ├── components/                  # 5 component tái sử dụng
+│   │   │   ├── ProductCard.tsx          # Card hiển thị sản phẩm
+│   │   │   ├── CategoryScroll.tsx       # Thanh cuộn danh mục ngang
+│   │   │   ├── NotificationBell.tsx     # Chuông thông báo real-time
+│   │   │   ├── BottomNav.tsx            # Thanh điều hướng mobile
+│   │   │   └── BackgroundSelector.tsx   # Chọn background profile
+│   │   ├── context/                     # React Context quản lý state
+│   │   │   ├── AuthContext.tsx          # Quản lý trạng thái đăng nhập (JWT)
+│   │   │   └── BackgroundContext.tsx    # Quản lý theme/background
+│   │   ├── services/                    # API service layer (Axios)
+│   │   │   ├── api.ts                   # Axios instance + interceptors
+│   │   │   └── socket.ts               # Socket.io client connection
+│   │   ├── types/                       # TypeScript type definitions
+│   │   ├── layouts/                     # Layout wrapper components
+│   │   ├── App.tsx                      # Root component + Router config
+│   │   └── main.tsx                     # Entry point (ReactDOM)
 │   ├── package.json
 │   └── vite.config.ts
 │
-├── server/                          # Backend (Express + Node.js)
+├── server/                              # Backend (Express + Node.js)
 │   ├── src/
-│   │   ├── controllers/             # 13 controller xử lý logic
-│   │   │   ├── auth.controller.ts   # Đăng nhập, đăng ký, quên MK
-│   │   │   ├── product.controller.ts # CRUD sản phẩm + Cloudinary
-│   │   │   ├── chat.controller.ts   # Gửi/nhận tin nhắn + Socket
-│   │   │   ├── order.controller.ts  # Đặt hàng, cập nhật trạng thái
-│   │   │   ├── payment.controller.ts # PayOS checkout + Webhook
-│   │   │   ├── admin.controller.ts  # Quản trị hệ thống
-│   │   │   ├── user.controller.ts   # Quản lý profile
-│   │   │   ├── category.controller.ts # Quản lý danh mục
-│   │   │   ├── wishlist.controller.ts # Yêu thích
-│   │   │   ├── rating.controller.ts # Đánh giá sau giao dịch
-│   │   │   ├── report.controller.ts # Báo cáo vi phạm
+│   │   ├── controllers/                 # 13 controller xử lý logic
+│   │   │   ├── auth.controller.ts       # Đăng nhập, đăng ký, quên MK
+│   │   │   ├── product.controller.ts    # CRUD sản phẩm + Cloudinary
+│   │   │   ├── chat.controller.ts       # Gửi/nhận tin nhắn + Socket
+│   │   │   ├── order.controller.ts      # Đặt hàng, cập nhật trạng thái
+│   │   │   ├── payment.controller.ts    # PayOS checkout + Webhook
+│   │   │   ├── admin.controller.ts      # Quản trị hệ thống
+│   │   │   ├── user.controller.ts       # Quản lý profile
+│   │   │   ├── category.controller.ts   # Quản lý danh mục
+│   │   │   ├── wishlist.controller.ts   # Yêu thích
+│   │   │   ├── rating.controller.ts     # Đánh giá sau giao dịch
+│   │   │   ├── report.controller.ts     # Báo cáo vi phạm
 │   │   │   ├── notification.controller.ts # Thông báo
-│   │   │   └── setting.controller.ts # Cài đặt hệ thống
-│   │   ├── services/                # 8 service tách biệt logic
-│   │   │   ├── auth.service.ts
-│   │   │   ├── product.service.ts
-│   │   │   ├── chat.service.ts
-│   │   │   ├── user.service.ts
-│   │   │   ├── category.service.ts
-│   │   │   ├── wishlist.service.ts
-│   │   │   ├── notification.service.ts
-│   │   │   └── setting.service.ts
-│   │   ├── routes/                  # 13 file định tuyến API
-│   │   ├── middleware/              # Auth middleware (JWT verify)
-│   │   ├── config/
-│   │   │   ├── db.ts               # Prisma Client init
-│   │   │   ├── socket.ts           # Socket.io init
-│   │   │   └── payos.ts            # PayOS SDK init
-│   │   ├── utils/                   # Helper functions
-│   │   ├── app.ts                   # Express app configuration
-│   │   └── server.ts               # HTTP + Socket.io server
+│   │   │   └── setting.controller.ts    # Cài đặt hệ thống
+│   │   ├── services/                    # 8 service tách biệt logic nghiệp vụ
+│   │   │   ├── auth.service.ts          # Xử lý đăng ký, hash password, JWT
+│   │   │   ├── product.service.ts       # CRUD sản phẩm, upload Cloudinary
+│   │   │   ├── chat.service.ts          # Tạo/lấy conversation, lưu message
+│   │   │   ├── user.service.ts          # Cập nhật profile, avatar
+│   │   │   ├── category.service.ts      # CRUD danh mục
+│   │   │   ├── wishlist.service.ts      # Thêm/xóa yêu thích
+│   │   │   ├── notification.service.ts  # Tạo/đọc thông báo
+│   │   │   └── setting.service.ts       # Đọc/ghi system settings
+│   │   ├── routes/                      # 13 file định tuyến API
+│   │   │   ├── auth.routes.ts           # /api/auth/*
+│   │   │   ├── product.routes.ts        # /api/products/*
+│   │   │   ├── chat.routes.ts           # /api/chat/*
+│   │   │   ├── order.routes.ts          # /api/orders/*
+│   │   │   ├── payment.routes.ts        # /api/payment/*
+│   │   │   ├── admin.routes.ts          # /api/admin/*
+│   │   │   ├── user.routes.ts           # /api/users/*
+│   │   │   ├── category.routes.ts       # /api/categories/*
+│   │   │   ├── wishlist.routes.ts       # /api/wishlist/*
+│   │   │   ├── rating.routes.ts         # /api/ratings/*
+│   │   │   ├── report.routes.ts         # /api/reports/*
+│   │   │   ├── notification.routes.ts   # /api/notifications/*
+│   │   │   └── setting.routes.ts        # /api/settings/*
+│   │   ├── middleware/                  # Middleware xác thực & upload
+│   │   │   ├── auth.middleware.ts       # Verify JWT, kiểm tra role (RBAC)
+│   │   │   └── upload.middleware.ts     # Multer config cho file upload
+│   │   ├── utils/                       # Hàm tiện ích dùng chung
+│   │   │   ├── cloudinary.ts            # Cloudinary SDK config + upload
+│   │   │   ├── jwt.ts                   # generateToken / verifyToken
+│   │   │   ├── mailer.ts               # Nodemailer transporter + sendMail
+│   │   │   └── slugify.ts              # Tạo slug URL-friendly cho sản phẩm
+│   │   ├── config/                      # Cấu hình kết nối
+│   │   │   ├── db.ts                    # Prisma Client singleton
+│   │   │   ├── socket.ts               # Socket.io init + room management
+│   │   │   └── payos.ts                # PayOS SDK init
+│   │   ├── scripts/                     # Scripts hỗ trợ
+│   │   │   └── seed.ts                  # Tạo tài khoản mặc định
+│   │   ├── app.ts                       # Express app + middleware + routes
+│   │   └── server.ts                    # HTTP server + Socket.io bootstrap
 │   ├── prisma/
-│   │   ├── schema.prisma           # Database schema (10 models)
-│   │   ├── migrations/             # Migration history
-│   │   └── ERD.svg                 # Sơ đồ ERD tự động
+│   │   ├── schema.prisma                # Database schema (10 models)
+│   │   ├── migrations/                  # Migration history
+│   │   └── ERD.svg                      # Sơ đồ ERD tự động
 │   └── package.json
+│
+├── Database/
+│   ├── passup.sql                       # SQL schema export (import được)
+│   └── README.txt                       # Hướng dẫn tạo DB
 │
 └── .gitignore
 ```
@@ -207,7 +241,7 @@ PassUp/
 ## 5. Hướng dẫn chạy dự án
 
 ### 5.1. Yêu cầu môi trường
-- **Node.js**: >= 18.0 (khuyến nghị 20.x LTS)
+- **Node.js**: >= 18.0
 - **npm**: >= 9.0
 - **PostgreSQL**: >= 14.0
 - **Git**: để clone source code
@@ -252,6 +286,9 @@ npm install
 # Tạo database schema + migrate
 npx prisma migrate dev
 
+# Tạo tài khoản mặc định (admin + user)
+npx ts-node src/scripts/seed.ts
+
 # Chạy server (development mode)
 npm run dev
 ```
@@ -278,14 +315,18 @@ Client sẽ chạy tại: **http://localhost:5173**
 
 ## 6. Tài khoản mặc định
 
-Hệ thống **KHÔNG** có tài khoản mặc định.
-Người dùng cần tự đăng ký tài khoản mới qua trang Đăng ký.
+Hệ thống có sẵn 2 tài khoản mặc định (được tạo bằng lệnh `npx ts-node src/scripts/seed.ts`):
 
-Để tạo tài khoản Admin:
-1. Đăng ký tài khoản bình thường qua giao diện
-2. Mở Prisma Studio: `npx prisma studio`
-3. Vào bảng `users` → Tìm tài khoản vừa tạo → Sửa trường `role` thành `ADMIN`
-4. Đăng nhập lại → Truy cập được Dashboard Admin
+| Vai trò | Email | Mật khẩu | Quyền hạn |
+|---|---|---|---|
+| **Admin** | `admin` | `12345` | Toàn quyền quản trị: thống kê, quản lý user, sản phẩm, danh mục, cài đặt |
+| **User** | `user` | `12345` | Người dùng thường: đăng tin, mua hàng, chat, thanh toán |
+
+> **Lưu ý:** Nếu tài khoản chưa tồn tại, chạy lệnh seed để tạo:
+> ```bash
+> cd server
+> npx ts-node src/scripts/seed.ts
+> ```
 
 ---
 
@@ -317,12 +358,3 @@ Người dùng cần tự đăng ký tài khoản mới qua trang Đăng ký.
 | POST | /api/payment/create | Tạo link thanh toán |
 | POST | /api/payment/webhook | PayOS Webhook callback |
 | GET | /api/admin/stats | Thống kê Admin |
-
----
-
-## 8. Tác giả
-
-- **Họ tên**: Lê Thiên Ân
-- **MSSV**: 22810310030
-- **Trường**: Đại học Điện Lực
-- **Đồ án**: Báo Cáo Thực Tập Tốt Nghiệp
