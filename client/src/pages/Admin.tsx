@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { 
     LayoutDashboard, Package, Users, AlertTriangle, 
-    TrendingUp, ShoppingCart, DollarSign,
+    TrendingUp,
     Trash2, ShieldCheck, Loader2, ArrowRight,
     Palette, Plus, Image as ImageIcon, Briefcase, Search, Edit2, XCircle, X
 } from 'lucide-react';

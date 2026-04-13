@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
-import { User, MapPin, Calendar, Star, MessageCircle, Loader2, AlertTriangle } from 'lucide-react';
+import { User, MapPin, Calendar, MessageCircle, Loader2, AlertTriangle } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import moment from 'moment';
 import { useAuth } from '../context/AuthContext';
@@ -12,7 +12,6 @@ export default function SellerProfile() {
     const { user } = useAuth();
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'products'>('products');
 
     // Report State
     const [showReportModal, setShowReportModal] = useState(false);

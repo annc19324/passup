@@ -16,7 +16,7 @@ export default function Login() {
 
     const passwordRef = useRef<HTMLInputElement>(null);
 
-    const handleKeyDown = (e: React.KeyboardEvent, nextRef?: React.RefObject<HTMLInputElement>) => {
+    const handleKeyDown = (e: React.KeyboardEvent, nextRef?: React.RefObject<HTMLInputElement | null>) => {
         if (e.key === 'Enter') {
             if (nextRef && nextRef.current) {
                 e.preventDefault();
