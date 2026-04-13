@@ -18,6 +18,8 @@ async function main() {
         },
         create: {
             email: adminEmail,
+            username: 'admin.super',
+            phone: '0988888888',
             password: hashedPassword,
             fullName: 'Admin PassUp',
             role: 'ADMIN'
