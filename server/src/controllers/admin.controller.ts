@@ -5,24 +5,14 @@ export const getStats = async (req: Request, res: Response) => {
     try {
         const totalUsers = await prisma.user.count();
         const totalProducts = await prisma.product.count();
-        const totalOrders = await prisma.order.count();
         const totalReports = await prisma.report.count({ where: { status: "PENDING" } });
-
-        // Doanh thu tạm tính (chỉ các đơn COMPLETED)
-        const orders = await prisma.order.findMany({
-            where: { status: "COMPLETED" },
-            select: { totalAmount: true }
-        });
-        const totalRevenue = orders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
 
         res.json({
             success: true,
             data: {
                 totalUsers,
                 totalProducts,
-                totalOrders,
                 totalReports,
-                totalRevenue
             }
         });
     } catch (error: any) {
@@ -56,24 +46,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
     }
 };
 
-export const getAllOrders = async (req: Request, res: Response) => {
-    try {
-        const orders = await prisma.order.findMany({
-            include: {
-                buyer: { select: { fullName: true, email: true } },
-                product: {
-                    include: {
-                        seller: { select: { fullName: true, email: true } }
-                    }
-                }
-            },
-            orderBy: { createdAt: "desc" }
-        });
-        res.json({ success: true, data: orders });
-    } catch (error: any) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+
 
 export const updateReportStatus = async (req: Request, res: Response) => {
     try {
@@ -134,19 +107,7 @@ export const updateProductByAdmin = async (req: Request, res: Response) => {
     }
 };
 
-export const updateOrderByAdmin = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const { status } = req.body;
-        const updated = await prisma.order.update({
-            where: { id: Number(id) },
-            data: { status }
-        });
-        res.json({ success: true, data: updated });
-    } catch (error: any) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+
 export const updateUserByAdmin = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;

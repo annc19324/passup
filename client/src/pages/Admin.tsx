@@ -13,7 +13,7 @@ import moment from 'moment';
 
 export default function Admin() {
     const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState<'stats' | 'products' | 'users' | 'reports' | 'backgrounds' | 'categories' | 'orders' | 'settings'>('stats');
+    const [activeTab, setActiveTab] = useState<'stats' | 'products' | 'users' | 'reports' | 'backgrounds' | 'categories' | 'settings'>('stats');
     const [stats, setStats] = useState<any>(null);
     const [dataList, setDataList] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -57,9 +57,7 @@ export default function Admin() {
             } else if (activeTab === 'users') {
                 const res = await api.get('/admin/users');
                 setDataList(res.data.data);
-            } else if (activeTab === 'orders') {
-                const res = await api.get('/admin/orders');
-                setDataList(res.data.data);
+
             } else if (activeTab === 'reports') {
                 const res = await api.get('/reports/all');
                 setDataList(res.data.data);
@@ -213,14 +211,7 @@ export default function Admin() {
     };
 
 
-    const handleUpdateOrderAdmin = async (id: number, status: string) => {
-        try {
-            await api.put(`/admin/orders/${id}`, { status });
-            fetchData();
-        } catch (err) {
-            toast.error('Lỗi cập nhật trạng thái đơn hàng');
-        }
-    };
+
 
     const handleUpdateUserAdmin = async (e: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -251,7 +242,7 @@ export default function Admin() {
         { id: 'categories', label: 'Danh mục', icon: Briefcase },
         { id: 'backgrounds', label: 'Cấu hình nền', icon: Palette },
         { id: 'products', label: 'Tin đăng', icon: Package },
-        { id: 'orders', label: 'Đơn hàng', icon: ShoppingCart },
+
         { id: 'users', label: 'Người dùng', icon: Users },
         { id: 'reports', label: 'Báo cáo', icon: AlertTriangle },
         { id: 'settings', label: 'Cài đặt', icon: TrendingUp },
@@ -262,7 +253,7 @@ export default function Admin() {
         const s = searchTerm.toLowerCase();
         if (activeTab === 'users') return item.fullName?.toLowerCase().includes(s) || item.email?.toLowerCase().includes(s);
         if (activeTab === 'products') return item.title?.toLowerCase().includes(s) || item.seller?.fullName?.toLowerCase().includes(s);
-        if (activeTab === 'orders') return item.id.toString().includes(s) || item.buyer?.fullName?.toLowerCase().includes(s) || item.product?.title?.toLowerCase().includes(s);
+
         if (activeTab === 'reports') return item.reason?.toLowerCase().includes(s) || item.description?.toLowerCase().includes(s);
         return true;
     }) : [];
@@ -312,7 +303,6 @@ export default function Admin() {
                             {[
                                 { label: 'Người dùng', value: stats.totalUsers, color: 'blue', icon: Users },
                                 { label: 'Sản phẩm', value: stats.totalProducts, color: 'emerald', icon: Package },
-                                { label: 'Đơn hàng', value: stats.totalOrders, color: 'orange', icon: ShoppingCart },
                                 { label: 'Báo cáo mới', value: stats.totalReports, color: 'rose', icon: AlertTriangle },
                             ].map(card => (
                                 <div key={card.label} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
@@ -325,18 +315,7 @@ export default function Admin() {
                             ))}
                         </div>
 
-                        <div className="bg-gradient-to-br from-indigo-700 to-purple-800 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden">
-                            <div className="relative z-10">
-                                <div className="text-indigo-100 font-bold uppercase tracking-widest text-xs mb-2">Tổng doanh thu toàn sàn</div>
-                                <div className="text-5xl font-black mb-4">
-                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(stats.totalRevenue)}
-                                </div>
-                                <p className="text-indigo-200 max-w-md text-sm leading-relaxed italic opacity-80">
-                                    Doanh thu được tính dựa trên các đơn hàng đã nhận hàng thành công (COMPLETED).
-                                </p>
-                            </div>
-                            <DollarSign className="absolute -bottom-10 -right-10 w-64 h-64 text-white/10 rotate-12" />
-                        </div>
+
                     </div>
                 )}
 
@@ -562,7 +541,7 @@ export default function Admin() {
                     <div className="space-y-6">
                         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <h1 className="text-3xl font-black text-slate-900 capitalize text-left">
-                                {activeTab === 'reports' ? 'Báo cáo vi phạm' : activeTab === 'products' ? 'Sản phẩm' : activeTab === 'users' ? 'Người dùng' : activeTab === 'orders' ? 'Tất cả Đơn hàng' : ''}
+                                {activeTab === 'reports' ? 'Báo cáo vi phạm' : activeTab === 'products' ? 'Sản phẩm' : activeTab === 'users' ? 'Người dùng' : ''}
                             </h1>
                             <div className="flex gap-3 w-full md:w-auto">
                                 <div className="relative flex-grow md:w-64">
@@ -628,28 +607,7 @@ export default function Admin() {
                                                                 <div className="text-[10px] font-black uppercase text-indigo-500 mt-1">{item.role}</div>
                                                             </div>
                                                         </div>
-                                                    ) : activeTab === 'orders' ? (
-                                                        <div className="text-left">
-                                                            <div className="font-bold text-slate-900 mb-1">Đơn #{item.id} - {item.product?.title}</div>
-                                                            <div className="text-xs text-slate-500 flex flex-col gap-0.5">
-                                                                <span>Người mua: {item.buyer?.fullName} ({item.buyer?.email})</span>
-                                                                <span>Người bán: {item.product?.seller?.fullName}</span>
-                                                                <span className="font-bold text-slate-800">Tổng: {new Intl.NumberFormat('vi-VN').format(item.totalAmount)}đ</span>
-                                                            </div>
-                                                            <div className="mt-2 flex gap-1">
-                                                                <select 
-                                                                    value={item.status} 
-                                                                    onChange={(e) => handleUpdateOrderAdmin(item.id, e.target.value)}
-                                                                    className="text-[10px] font-bold p-1 border rounded bg-slate-50"
-                                                                >
-                                                                    <option value="PENDING">PENDING</option>
-                                                                    <option value="CONFIRMED">CONFIRMED</option>
-                                                                    <option value="SHIPPING">SHIPPING</option>
-                                                                    <option value="COMPLETED">COMPLETED</option>
-                                                                    <option value="CANCELLED">CANCELLED</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
+
                                                     ) : false ? (
                                                         <div className="text-left">
                                                             <div className="font-bold text-slate-900">{item.user?.fullName}</div>
@@ -766,11 +724,7 @@ export default function Admin() {
                                                             </button>
                                                         </div>
                                                     )}
-                                                    {activeTab === 'orders' && (
-                                                        <div className="flex justify-end gap-2 text-xs font-bold text-slate-400">
-                                                            Quản trị viên có quyền ghi đè trạng thái
-                                                        </div>
-                                                    )}
+
                                                 </td>
                                             </tr>
                                         ))}

@@ -1,4 +1,4 @@
-# PassUp - Sàn Giao Dịch Đồ Cũ Dành Cho Sinh Viên
+# PassUp - Trao Đổi, Mua Bán Sản Phẩm Dành Cho Sinh Viên
 
 ## 1. Giới thiệu dự án
 

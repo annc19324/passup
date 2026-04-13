@@ -8,32 +8,44 @@ export const createPaymentLink = async (req: Request, res: Response) => {
         const userId = (req as any).user.id;
         const { amount, description, type, productId } = req.body;
 
-        const truncatedDescription = (description || "Thanh toan PassUp").substring(0, 25);
-        const orderCode = Number(String(Date.now()).slice(-6)); 
+        // Theo tài liệu chính thức PayOS v2: https://payos.vn/docs/sdks/back-end/node
+        const orderCode = Number(String(Date.now()).slice(-6));
 
         const paymentData = {
             orderCode: orderCode,
-            amount: amount,
-            description: truncatedDescription,
+            amount: Number(amount),
+            description: description || "Thanh toan PassUp",
+            items: [
+                {
+                    name: description || "PassUp",
+                    quantity: 1,
+                    price: Number(amount),
+                }
+            ],
             cancelUrl: process.env.PAYOS_CANCEL_URL || "http://localhost:5173/profile",
             returnUrl: process.env.PAYOS_RETURN_URL || "http://localhost:5173/profile",
-            items: [{ name: truncatedDescription, quantity: 1, price: amount }]
         };
 
+        console.log(">>> PayOS Request:", JSON.stringify(paymentData, null, 2));
+
         const paymentLink = await payos.paymentRequests.create(paymentData);
+
+        console.log(">>> PayOS Response:", paymentLink.checkoutUrl);
 
         await prisma.notification.create({
             data: {
                 userId: userId,
                 title: `Đơn hàng [ORD${orderCode}]`,
-                content: `Vui lòng thanh toán ${amount.toLocaleString()}đ cho gói ${description}. Đơn hàng sẽ được tự động duyệt ngay khi tiền vào.`,
+                content: `Vui lòng thanh toán ${Number(amount).toLocaleString()}đ cho gói ${description}. Đơn hàng sẽ được tự động duyệt ngay khi tiền vào.`,
                 type: `PAYMENT_PENDING:${type}:${productId || 'null'}`
             }
         });
 
         res.json({ success: true, checkoutUrl: paymentLink.checkoutUrl, orderCode });
     } catch (error: any) {
-        console.error("PayOS Error:", error);
+        console.error(">>> PayOS Error:", error?.message);
+        console.error(">>> PayOS Error Status:", error?.status);
+        console.error(">>> PayOS Error Detail:", JSON.stringify(error?.error || error?.body || {}, null, 2));
         res.status(500).json({ success: false, message: error.message });
     }
 };

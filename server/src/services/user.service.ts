@@ -63,12 +63,6 @@ export const getPublicProfileData = async (userId: number) => {
                 where: { status: 'AVAILABLE' },
                 orderBy: { createdAt: 'desc' },
                 include: { category: true }
-            },
-            ratingsReceived: {
-                include: {
-                    reviewer: { select: { fullName: true, avatar: true } }
-                },
-                orderBy: { createdAt: 'desc' }
             }
         }
     });

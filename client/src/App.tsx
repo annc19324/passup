@@ -10,7 +10,7 @@ import Profile from './pages/Profile';
 import Chat from './pages/Chat';
 import EditProduct from './pages/EditProduct';
 import Wishlist from './pages/Wishlist';
-import Orders from './pages/Orders';
+
 import SellerProfile from './pages/SellerProfile';
 import Admin from './pages/Admin';
 import Pricing from './pages/Pricing';
@@ -100,9 +100,7 @@ function App() {
                  <Link to="/my-products" className="px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition-all font-bold text-xs flex items-center gap-1.5">
                     <Package className="w-4 h-4" /> Tin đăng
                  </Link>
-                 <Link to="/orders" className="px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition-all font-bold text-xs flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4" /> Đơn hàng
-                 </Link>
+
                  <Link to="/wishlist" className="px-3 py-2 rounded-xl text-slate-600 hover:bg-slate-50 transition-all font-bold text-xs flex items-center gap-1.5">
                     <Heart className="w-4 h-4" /> Yêu thích
                  </Link>
@@ -164,9 +162,6 @@ function App() {
                                    <Link to="/my-products" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 transition-all font-bold text-sm">
                                        <Package className="w-4 h-4" /> Tin đăng
                                    </Link>
-                                   <Link to="/orders" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 transition-all font-bold text-sm">
-                                       <ShieldCheck className="w-4 h-4" /> Đơn hàng
-                                   </Link>
                                    <Link to="/wishlist" onClick={() => setIsDropdownOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-600 hover:bg-slate-50 transition-all font-bold text-sm">
                                        <Heart className="w-4 h-4" /> Yêu thích
                                    </Link>
@@ -202,7 +197,7 @@ function App() {
           <Route path="/my-products" element={<MyProducts />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/chat" element={<Chat />} />
-          <Route path="/orders" element={<Orders />} />
+
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/edit-product/:id" element={<EditProduct />} />
           <Route path="/product/:id" element={<ProductDetail />} />

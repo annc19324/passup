@@ -69,16 +69,7 @@ export default function ProductDetail() {
         fetchProduct();
     }, [id]);
 
-    const handleOrder = async () => {
-        if (!user) { navigate('/login'); return; }
-        try {
-            const res = await api.post('/orders/create', {
-                productId: product.id, totalAmount: product.price, shippingPhone: user.phone || '',
-                shippingAddress: user.addressDetail ? `${user.addressDetail}, ${user.ward || ''}, ${user.district || ''}, ${user.province || ''}` : user.address || ''
-            });
-            if (res.data.success) { toast.success('Đặt hàng thành công!'); navigate('/orders'); }
-        } catch (err: any) { toast.error(err.response?.data?.message || 'Lỗi đặt hàng'); }
-    };
+
 
     if (loading) return <div className="p-20 text-center animate-pulse text-slate-300"><Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" /> Đang tải dữ liệu...</div>;
     if (error || !product) return <div className="text-center py-20"><h2 className="text-2xl font-bold text-slate-700 mb-4">{error || 'Không tìm thấy sản phẩm'}</h2><Link to="/" className="text-blue-600 underline">Quay về trang chủ</Link></div>;
@@ -165,9 +156,8 @@ export default function ProductDetail() {
                                 </div>
                             ) : (
                                 <div className="flex gap-2">
-                                    <button onClick={handleChat} disabled={chatLoading} className="w-16 h-14 flex items-center justify-center bg-white border-2 border-blue-600 text-blue-600 rounded-2xl hover:bg-blue-50 transition-all">{chatLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : <MessageCircle className="w-6 h-6" />}</button>
-                                    <button onClick={handleOrder} disabled={product.status === 'SOLD' || product.stock <= 0} className={`flex-grow py-4 font-black rounded-2xl text-sm shadow-xl hover:bg-blue-700 active:scale-95 transition-all uppercase tracking-widest disabled:grayscale disabled:opacity-50 ${product.status === 'RESERVED' ? 'bg-amber-400 text-slate-900 shadow-amber-500/20' : 'bg-blue-600 text-white shadow-blue-500/20'}`}>
-                                        {product.status === 'RESERVED' && product.stock > 0 ? 'MUA DỰ PHÒNG' : (product.status === 'SOLD' || product.stock <= 0 ? 'ĐÃ HẾT HÀNG' : 'MUA NGAY')}
+                                    <button onClick={handleChat} disabled={chatLoading} className="flex-grow py-4 bg-blue-600 text-white font-black rounded-2xl flex items-center justify-center gap-2 hover:bg-blue-700 shadow-xl shadow-blue-500/20 active:scale-95 transition-all text-sm tracking-widest uppercase">
+                                        {chatLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <MessageCircle className="w-5 h-5" />} NHẮN TIN VỚI NGƯỜI BÁN
                                     </button>
                                     <button onClick={handleLike} disabled={likeLoading} className={`w-14 h-14 flex items-center justify-center rounded-2xl border-2 transition-all ${isLiked ? 'bg-rose-50 border-rose-200 text-rose-500' : 'bg-white border-slate-200 text-slate-400 hover:text-rose-500'}`}><Heart className={`w-6 h-6 ${isLiked ? 'fill-current' : ''}`} /></button>
                                 </div>

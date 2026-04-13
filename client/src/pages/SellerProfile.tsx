@@ -12,7 +12,7 @@ export default function SellerProfile() {
     const { user } = useAuth();
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'products' | 'ratings'>('products');
+    const [activeTab, setActiveTab] = useState<'products'>('products');
 
     // Report State
     const [showReportModal, setShowReportModal] = useState(false);
@@ -74,9 +74,7 @@ export default function SellerProfile() {
         </div>
     );
 
-    const avgRating = profile.ratingsReceived?.length > 0 
-        ? (profile.ratingsReceived.reduce((sum: number, r: any) => sum + r.rating, 0) / profile.ratingsReceived.length).toFixed(1)
-        : '0.0';
+
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
@@ -108,7 +106,6 @@ export default function SellerProfile() {
                             <div className="flex flex-wrap justify-center md:justify-start gap-4 text-slate-500 font-medium">
                                 <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-rose-500" /> {profile.province || profile.address || 'Toàn quốc'}</span>
                                 <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-blue-500" /> Tham gia {moment(profile.createdAt).format('MM/YYYY')}</span>
-                                <span className="flex items-center gap-1.5"><Star className="w-4 h-4 text-amber-500 fill-amber-500" /> {avgRating} ({profile.ratingsReceived?.length} đánh giá)</span>
                             </div>
                         </div>
 
@@ -181,10 +178,6 @@ export default function SellerProfile() {
                             <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Đã bán</div>
                         </div>
                         <div className="text-center md:text-left">
-                            <div className="text-2xl font-black text-slate-900">{profile.ratingsReceived?.length || 0}</div>
-                            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Phản hồi</div>
-                        </div>
-                        <div className="text-center md:text-left">
                             <div className="text-2xl font-black text-slate-900">100%</div>
                             <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">Tỉ lệ phản hồi</div>
                         </div>
@@ -192,26 +185,15 @@ export default function SellerProfile() {
                 </div>
             </div>
 
-            {/* Content Tabs */}
             <div className="flex gap-8 border-b border-slate-200 mb-8">
                 <button 
-                    onClick={() => setActiveTab('products')}
-                    className={`pb-4 px-2 font-black text-lg transition-all relative ${activeTab === 'products' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+                    className={`pb-4 px-2 font-black text-lg transition-all relative text-blue-600`}
                 >
                     Sản phẩm đang bán
-                    {activeTab === 'products' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full" />}
-                </button>
-                <button 
-                    onClick={() => setActiveTab('ratings')}
-                    className={`pb-4 px-2 font-black text-lg transition-all relative ${activeTab === 'ratings' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
-                >
-                    Đánh giá từ người mua
-                    {activeTab === 'ratings' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full" />}
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full" />
                 </button>
             </div>
 
-            {/* Tab Panels */}
-            {activeTab === 'products' ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                     {profile.products?.length === 0 ? (
                         <div className="col-span-full py-20 text-center bg-white rounded-[2rem] border border-slate-100 italic text-slate-400">
@@ -238,37 +220,6 @@ export default function SellerProfile() {
                         />
                     ))}
                 </div>
-            ) : (
-                <div className="space-y-4">
-                    {profile.ratingsReceived?.length === 0 ? (
-                        <div className="py-20 text-center bg-white rounded-[2rem] border border-slate-100 italic text-slate-400">
-                            Chưa có đánh giá nào từ người mua.
-                        </div>
-                    ) : profile.ratingsReceived.map((r: any) => (
-                        <div key={r.id} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
-                                        <img src={r.reviewer?.avatar} className="w-full h-full object-cover" alt="" />
-                                    </div>
-                                    <div>
-                                        <div className="font-bold text-slate-900">{r.reviewer?.fullName}</div>
-                                        <div className="flex text-amber-400 text-xs">
-                                            {[...Array(5)].map((_, i) => (
-                                                <Star key={i} className={`w-3.5 h-3.5 ${i < r.rating ? 'fill-current' : 'text-slate-200'}`} />
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                                <span className="text-xs font-medium text-slate-400">{moment(r.createdAt).fromNow()}</span>
-                            </div>
-                            <p className="text-slate-600 text-sm leading-relaxed mb-4 bg-slate-50 p-4 rounded-2xl border border-slate-100 italic">
-                                "{r.comment || 'Không có nhận xét'}"
-                            </p>
-                        </div>
-                    ))}
-                </div>
-            )}
         </div>
     );
 }

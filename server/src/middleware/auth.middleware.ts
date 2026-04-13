@@ -18,7 +18,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
 
             // Get user from the token
             const user = await prisma.user.findUnique({
-                where: { id: decoded.userId },
+                where: { id: Number(decoded.userId) },
                 select: { id: true, email: true, fullName: true, role: true, avatar: true, background: true, pushCount: true, postLimit: true, status: true }
             });
 
@@ -54,7 +54,7 @@ export const optionalProtect = async (req: Request, res: Response, next: NextFun
             token = req.headers.authorization.split(" ")[1];
             const decoded: any = verifyToken(token);
             const user = await prisma.user.findUnique({
-                where: { id: decoded.userId },
+                where: { id: Number(decoded.userId) },
                 select: { id: true, email: true, fullName: true, role: true, avatar: true, background: true, pushCount: true, postLimit: true, status: true }
             });
 

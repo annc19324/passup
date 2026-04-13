@@ -11,8 +11,7 @@ import productRoutes from "./routes/product.routes";
 import userRoutes from "./routes/user.routes";
 import chatRoutes from "./routes/chat.routes";
 import wishlistRoutes from "./routes/wishlist.routes";
-import orderRoutes from "./routes/order.routes";
-import ratingRoutes from "./routes/rating.routes";
+
 import reportRoutes from "./routes/report.routes";
 import adminRoutes from "./routes/admin.routes";
 import notificationRoutes from "./routes/notification.routes";
@@ -37,8 +36,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/wishlist", wishlistRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/ratings", ratingRoutes);
+
 app.use("/api/reports", reportRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notificationRoutes);

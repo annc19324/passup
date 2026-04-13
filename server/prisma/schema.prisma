@@ -36,10 +36,7 @@ model User {
   conversationsAsUser2  Conversation[] @relation("User2Conversations")
   messages              SentMessage[]
   notifications         Notification[]
-  orders                Order[]        @relation("BuyerOrders")
   products              Product[]
-  ratingsReceived       Rating[]       @relation("RevieweeRatings")
-  ratingsGiven          Rating[]       @relation("ReviewerRatings")
   reportsMade           Report[]       @relation("Reporter")
   wishlists             Wishlist[]
 
@@ -134,7 +131,6 @@ model Product {
   shipPrice     String?
   stock         Int            @default(1)
   conversations Conversation[]
-  orders        Order[]
   category      Category       @relation(fields: [categoryId], references: [id])
   seller        User           @relation(fields: [sellerId], references: [id], onDelete: Cascade)
   wishlists     Wishlist[]
@@ -154,37 +150,7 @@ model Wishlist {
   @@map("wishlists")
 }
 
-model Order {
-  id              Int         @id @default(autoincrement())
-  buyerId         Int
-  productId       Int
-  status          OrderStatus @default(PENDING)
-  totalAmount     Decimal     @db.Decimal(10, 2)
-  shippingPhone   String?
-  shippingAddress String?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  buyer           User        @relation("BuyerOrders", fields: [buyerId], references: [id])
-  product         Product     @relation(fields: [productId], references: [id])
-  rating          Rating?
 
-  @@map("orders")
-}
-
-model Rating {
-  id         Int      @id @default(autoincrement())
-  orderId    Int      @unique
-  reviewerId Int
-  revieweeId Int
-  rating     Int      @default(5)
-  comment    String?
-  createdAt  DateTime @default(now())
-  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  reviewee   User     @relation("RevieweeRatings", fields: [revieweeId], references: [id])
-  reviewer   User     @relation("ReviewerRatings", fields: [reviewerId], references: [id])
-
-  @@map("ratings")
-}
 
 model Report {
   id          Int        @id @default(autoincrement())
@@ -226,13 +192,7 @@ enum ProductStatus {
   SOLD
 }
 
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  SHIPPING
-  COMPLETED
-  CANCELLED
-}
+
 
 enum ReportType {
   PRODUCT
