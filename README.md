@@ -5,8 +5,9 @@
 **PassUp** là hệ thống sàn thương mại điện tử mô hình C2C (Customer-to-Customer) được phát triển dành riêng cho cộng đồng sinh viên. Hệ thống cho phép sinh viên đăng bán, tìm kiếm và mua lại đồ dùng cũ (sách vở, thiết bị điện tử, đồ gia dụng...) một cách tiện lợi thông qua giao diện web hiện đại.
 
 Điểm nổi bật của PassUp:
-- **Chat thời gian thực** (Socket.io) giúp người mua và người bán thương lượng trực tiếp
-- **Thanh toán trực tuyến** (PayOS) hỗ trợ nạp lượt đẩy tin bài qua mã QR
+- **Chat thời gian thực** (Socket.io) hỗ trợ thương lượng trực tiếp
+- **Model thỏa thuận**: Chuyên biệt cho bán lại, bỏ qua luồng thanh toán đơn hàng rườm rà.
+- **Thanh toán dịch vụ** (PayOS) hỗ trợ nạp lượt đẩy tin bài qua mã QR
 - **Lưu trữ ảnh đám mây** (Cloudinary) tối ưu hóa hiệu năng tải ảnh
 
 ---
@@ -110,13 +111,10 @@ PassUp/
 │   │   │   ├── auth.controller.ts       # Đăng nhập, đăng ký, quên MK
 │   │   │   ├── product.controller.ts    # CRUD sản phẩm + Cloudinary
 │   │   │   ├── chat.controller.ts       # Gửi/nhận tin nhắn + Socket
-│   │   │   ├── order.controller.ts      # Đặt hàng, cập nhật trạng thái
-│   │   │   ├── payment.controller.ts    # PayOS checkout + Webhook
 │   │   │   ├── admin.controller.ts      # Quản trị hệ thống
 │   │   │   ├── user.controller.ts       # Quản lý profile
 │   │   │   ├── category.controller.ts   # Quản lý danh mục
 │   │   │   ├── wishlist.controller.ts   # Yêu thích
-│   │   │   ├── rating.controller.ts     # Đánh giá sau giao dịch
 │   │   │   ├── report.controller.ts     # Báo cáo vi phạm
 │   │   │   ├── notification.controller.ts # Thông báo
 │   │   │   └── setting.controller.ts    # Cài đặt hệ thống
@@ -191,28 +189,18 @@ PassUp/
 - Lọc sản phẩm theo trạng thái (AVAILABLE, RESERVED, SOLD)
 - Quản lý tồn kho (stock)
 
-### 4.3. Chat thương lượng (Real-time)
+### 4.4. Chat thương lượng (Real-time)
 - Nhắn tin 1-1 giữa người mua và người bán
 - Gửi kèm hình ảnh trong tin nhắn
 - Trạng thái đã đọc (isRead)
 - Thông báo tin nhắn mới tức thì qua Socket.io
 
-### 4.4. Đặt hàng (Order)
-- Tạo đơn hàng (PENDING → CONFIRMED → SHIPPING → COMPLETED)
-- Hủy đơn hàng (CANCELLED)
-- Lịch sử đơn hàng
-- Thông tin giao hàng (địa chỉ, SĐT)
-
-### 4.5. Thanh toán đẩy tin (Payment - PayOS)
+### 4.5. Thanh toán dịch vụ (Payment - PayOS)
 - Chọn gói nạp lượt đẩy tin
 - Tạo link thanh toán QR (PayOS API)
 - Xử lý Webhook tự động (HMAC-SHA256 verify)
 - Cập nhật pushCount cho người dùng
 - Quản lý gói subscription
-
-### 4.6. Đánh giá (Rating)
-- Đánh giá người bán sau hoàn tất đơn hàng (1-5 sao)
-- Bình luận kèm đánh giá
 
 ### 4.7. Yêu thích (Wishlist)
 - Thêm / Xóa sản phẩm khỏi danh sách yêu thích
@@ -317,10 +305,11 @@ Client sẽ chạy tại: **http://localhost:5173**
 
 Hệ thống có sẵn 2 tài khoản mặc định (được tạo bằng lệnh `npx ts-node src/scripts/seed.ts`):
 
-| Vai trò | Email | Mật khẩu | Quyền hạn |
-|---|---|---|---|
-| **Admin** | `admin` | `12345` | Toàn quyền quản trị: thống kê, quản lý user, sản phẩm, danh mục, cài đặt |
-| **User** | `user` | `12345` | Người dùng thường: đăng tin, mua hàng, chat, thanh toán |
+| Vai trò | Username | Password | Email | FullName |
+|---|---|---|---|---|
+| **Admin** | `admin` | `12345` | `admin@passup.com` | `admin` |
+| **User** | `user` | `12345` | `user@gmail.com` | `user` |
+| **An** | `lethienan` | `12345` | `lethienan@gmail.com` | `Lê Thiên An` |
 
 > **Lưu ý:** Nếu tài khoản chưa tồn tại, chạy lệnh seed để tạo:
 > ```bash

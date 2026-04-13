@@ -42,10 +42,10 @@ export async function changePassword(req: Request, res: Response) {
 // POST /api/auth/register
 export async function register(req: Request, res: Response) {
     try {
-        const { email, password, fullName } = req.body;
+        const { email, password, fullName, username, phone } = req.body;
 
-        // Validate đơn giản
-        if (!email || !password || !fullName) {
+        // Validate đơn giản phía backend
+        if (!email || !password || !fullName || !username || !phone) {
             res.status(400).json({
                 success: false,
                 message: "Vui lòng điền đầy đủ thông tin!",
@@ -54,7 +54,7 @@ export async function register(req: Request, res: Response) {
         }
 
         // Gọi service xử lý logic
-        const result = await registerUser({ email, password, fullName });
+        const result = await registerUser({ email, password, fullName, username, phone });
 
         // Trả về kết quả
         res.status(201).json({
@@ -73,17 +73,17 @@ export async function register(req: Request, res: Response) {
 // POST /api/auth/login
 export async function login(req: Request, res: Response) {
     try {
-        const { email, password } = req.body;
+        const { identifier, password } = req.body;
 
-        if (!email || !password) {
+        if (!identifier || !password) {
             res.status(400).json({
                 success: false,
-                message: "Vui lòng điền email và mật khẩu!",
+                message: "Vui lòng nhập tài khoản và mật khẩu!",
             });
             return;
         }
 
-        const result = await loginUser({ email, password });
+        const result = await loginUser({ identifier, password });
 
         res.status(200).json({
             success: true,

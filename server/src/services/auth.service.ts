@@ -4,14 +4,24 @@ import { generateToken } from "../utils/jwt";
 
 export async function registerUser(data: {
     email: string,
+    username: string,
+    phone: string,
     password: string,
     fullName: string,
 }) {
-    const existingUser = await prisma.user.findUnique({
-        where: { email: data.email },
+    const existingUser = await prisma.user.findFirst({
+        where: {
+            OR: [
+                { email: data.email },
+                { username: data.username },
+                { phone: data.phone }
+            ]
+        },
     });
     if (existingUser) {
-        throw new Error("Email da duoc su dung")
+        if (existingUser.email === data.email) throw new Error("Email đã được sử dụng");
+        if (existingUser.username === data.username) throw new Error("Username đã tồn tại");
+        if (existingUser.phone === data.phone) throw new Error("Số điện thoại đã được đăng ký");
     }
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -19,6 +29,8 @@ export async function registerUser(data: {
     const newUser = await prisma.user.create({
         data: {
             email: data.email,
+            username: data.username,
+            phone: data.phone,
             password: hashedPassword,
             fullName: data.fullName,
         }
@@ -29,6 +41,8 @@ export async function registerUser(data: {
         user: {
             id: newUser.id,
             email: newUser.email,
+            username: newUser.username,
+            phone: newUser.phone,
             fullName: newUser.fullName,
             role: newUser.role,
         },
@@ -37,15 +51,21 @@ export async function registerUser(data: {
 }
 
 export async function loginUser(data: {
-    email: string,
+    identifier: string, // email, username, or phone
     password: string,
 }) {
-    const user = await prisma.user.findUnique({
-        where: { email: data.email },
+    const user = await prisma.user.findFirst({
+        where: {
+            OR: [
+                { email: data.identifier },
+                { username: data.identifier },
+                { phone: data.identifier }
+            ]
+        },
     });
 
     if (!user) {
-        throw new Error("Email không tồn tại");
+        throw new Error("Tài khoản không tồn tại");
     }
 
     const isMatch = await bcrypt.compare(data.password, user.password);
@@ -63,6 +83,8 @@ export async function loginUser(data: {
         user: {
             id: user.id,
             email: user.email,
+            username: user.username,
+            phone: user.phone,
             fullName: user.fullName,
             role: user.role,
         },
