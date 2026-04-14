@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Zap, Package, Loader2, X, RefreshCcw, ChevronLeft } from 'lucide-react';
-import { usePayOS, type PayOSConfig } from 'payos-checkout';
+import { Zap, Package, Loader2, ChevronLeft } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,28 +8,7 @@ export default function Pricing() {
     const navigate = useNavigate();
     const [userData, setUserData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [checkoutUrl, setCheckoutUrl] = useState('');
-    const [orderCode, setOrderCode] = useState<number | null>(null);
-    const [showPayOS, setShowPayOS] = useState(false);
-    const [verifying, setVerifying] = useState(false);
 
-    const payOSConfig: PayOSConfig = {
-        RETURN_URL: window.location.href,
-        ELEMENT_ID: "payos-checkout-container", 
-        CHECKOUT_URL: checkoutUrl,
-        embedded: true,
-        onSuccess: () => {
-            toast.success("Thanh toán thành công! Hệ thống đang xử lý...");
-            handleCheckPayment(orderCode);
-            setShowPayOS(false);
-        },
-        onCancel: () => {
-            setShowPayOS(false);
-            toast.error("Đã hủy thanh toán.");
-        }
-    };
-
-    const { open, exit } = usePayOS(payOSConfig);
 
     const fetchUserData = () => {
         api.get('/users/me')
@@ -45,25 +23,15 @@ export default function Pricing() {
 
     useEffect(() => { fetchUserData(); }, []);
 
-    useEffect(() => {
-        if (checkoutUrl && showPayOS) {
-            const timer = setTimeout(() => {
-                const element = document.getElementById("payos-checkout-container");
-                if (element) open();
-            }, 100);
-            return () => clearTimeout(timer);
-        }
-    }, [checkoutUrl, showPayOS]);
 
     const handleCreatePayment = async (amount: number, type: string, description: string) => {
         const loadingToast = toast.loading("Đang khởi tạo QR...");
         try {
             const res = await api.post('/payment/create-link', { amount, type, description });
             if (res.data.success) {
-                setCheckoutUrl(res.data.checkoutUrl);
-                setOrderCode(res.data.orderCode);
-                setShowPayOS(true);
                 toast.dismiss(loadingToast);
+                // Redirect user directly to PayOS checkout page like testPayos
+                window.location.href = res.data.checkoutUrl;
             }
         } catch (err: any) {
             toast.dismiss(loadingToast);
@@ -71,26 +39,7 @@ export default function Pricing() {
         }
     };
 
-    const handleCheckPayment = async (code: number | null) => {
-        if (!code) return;
-        setVerifying(true);
-        const verifyingToast = toast.loading("Đang xác thực giao dịch...");
-        try {
-            const res = await api.get(`/payment/check/${code}`);
-            if (res.data.success) {
-                toast.success(res.data.message);
-                fetchUserData();
-                setOrderCode(null);
-            } else {
-                toast(res.data.message, { icon: 'ℹ️' });
-            }
-        } catch (err: any) {
-            toast.error("Lỗi xác thực: Trình duyệt chưa thể kết nối...");
-        } finally {
-            setVerifying(false);
-            toast.dismiss(verifyingToast);
-        }
-    };
+
 
     if (loading) return <div className="flex justify-center items-center h-64 animate-pulse"><Loader2 className="w-10 h-10 animate-spin text-blue-500" /></div>;
 
@@ -100,37 +49,18 @@ export default function Pricing() {
                 <button onClick={() => navigate(-1)} className="p-3 bg-white shadow-sm border border-slate-100 rounded-2xl hover:bg-slate-50 transition-all">
                     <ChevronLeft className="w-6 h-6 text-slate-600" />
                 </button>
-                <div>
+                <div className="flex-1">
                     <h1 className="text-2xl font-black text-slate-900">Gói dịch vụ</h1>
                     <p className="text-sm text-slate-500 font-medium">Nâng cấp trải nghiệm bán hàng của bạn</p>
                 </div>
+                <button 
+                    onClick={() => handleCreatePayment(2000, "TEST_PACK", "Mua ngay test")} 
+                    className="p-3 bg-red-50 text-red-600 font-bold border border-red-200 rounded-2xl hover:bg-red-100 transition-all text-xs shadow-sm uppercase tracking-wider"
+                >
+                    MUA NGAY TEST (2000đ)
+                </button>
             </div>
 
-            {showPayOS && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => { exit(); setShowPayOS(false); }}></div>
-                    <div className="relative bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-[85vh]">
-                        <div className="flex items-center justify-between p-6 border-b border-slate-100">
-                            <div className="flex items-center gap-3">
-                                <Zap className="w-5 h-5 text-blue-600 fill-current" />
-                                <h3 className="font-black text-slate-900">Thanh toán Quét mã QR</h3>
-                            </div>
-                            <button onClick={() => { exit(); setShowPayOS(false); }} className="p-2 hover:bg-slate-100 rounded-full"><X className="w-6 h-6 text-slate-400" /></button>
-                        </div>
-                        <div id="payos-checkout-container" className="flex-grow bg-slate-50"></div>
-                        <div className="p-4 border-t border-slate-50 flex gap-2">
-                            <button 
-                                onClick={() => handleCheckPayment(orderCode)} 
-                                disabled={verifying}
-                                className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-black text-xs flex items-center justify-center gap-2"
-                            >
-                                {verifying ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCcw className="w-4 h-4" />}
-                                TÔI ĐÃ CHUYỂN KHOẢN XONG
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                 <div className="bg-gradient-to-br from-blue-600 to-blue-700 p-8 rounded-[2.5rem] text-white shadow-xl shadow-blue-500/20 relative overflow-hidden group">

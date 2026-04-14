@@ -8,8 +8,8 @@ export const createPaymentLink = async (req: Request, res: Response) => {
         const userId = (req as any).user.id;
         const { amount, description, type, productId } = req.body;
 
-        // Theo tài liệu chính thức PayOS v2: https://payos.vn/docs/sdks/back-end/node
-        const orderCode = Number(String(Date.now()).slice(-6));
+        // Sử dụng Date.now() để mốc thời gian millisecond, tránh trùng lặp orderCode
+        const orderCode = Number(String(Date.now())); 
 
         const paymentData = {
             orderCode: orderCode,
@@ -17,7 +17,7 @@ export const createPaymentLink = async (req: Request, res: Response) => {
             description: description || "Thanh toan PassUp",
             items: [
                 {
-                    name: description || "PassUp",
+                    name: "Nap Luot PassUp",
                     quantity: 1,
                     price: Number(amount),
                 }
@@ -28,9 +28,9 @@ export const createPaymentLink = async (req: Request, res: Response) => {
 
         console.log(">>> PayOS Request:", JSON.stringify(paymentData, null, 2));
 
-        const paymentLink = await payos.paymentRequests.create(paymentData);
+        const paymentLinkRes = await payos.paymentRequests.create(paymentData);
 
-        console.log(">>> PayOS Response:", paymentLink.checkoutUrl);
+        console.log(">>> PayOS Response:", paymentLinkRes.checkoutUrl);
 
         await prisma.notification.create({
             data: {
@@ -41,7 +41,21 @@ export const createPaymentLink = async (req: Request, res: Response) => {
             }
         });
 
-        res.json({ success: true, checkoutUrl: paymentLink.checkoutUrl, orderCode });
+        return res.json({ 
+            success: true, 
+            checkoutUrl: paymentLinkRes.checkoutUrl, 
+            orderCode: paymentLinkRes.orderCode,
+            data: {
+                bin: paymentLinkRes.bin,
+                checkoutUrl: paymentLinkRes.checkoutUrl,
+                accountNumber: paymentLinkRes.accountNumber,
+                accountName: paymentLinkRes.accountName,
+                amount: paymentLinkRes.amount,
+                description: paymentLinkRes.description,
+                orderCode: paymentLinkRes.orderCode,
+                qrCode: paymentLinkRes.qrCode,
+            }
+        });
     } catch (error: any) {
         console.error(">>> PayOS Error:", error?.message);
         console.error(">>> PayOS Error Status:", error?.status);

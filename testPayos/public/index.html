@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayOS QR Demo - Premium Checkout</title>
+    <!-- Use the PayOS Checkout SDK from the correct CDN -->
+    <script src="https://cdn.payos.vn/payos-checkout/v1/stable/payos-initialize.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066FF;
+            --primary-hover: #0052cc;
+            --bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text: #1E293B;
+            --text-muted: #64748B;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 2rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            padding: 2.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #0066FF 0%, #00CCFF 100%);
+            border-radius: 20px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 10px 15px -3px rgba(0, 102, 255, 0.3);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .payment-info {
+            background: #F1F5F9;
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .amount {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        #pay-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        #pay-btn:hover {
+            background-color: var(--primary-hover);
+            box-shadow: 0 10px 15px -3px rgba(0, 102, 255, 0.2);
+        }
+
+        #pay-btn:disabled {
+            background-color: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        /* Iframe container */
+        #payment-container {
+            width: 100%;
+            min-height: 500px;
+            margin-top: 2rem;
+            border-radius: 16px;
+            overflow: hidden;
+            display: none;
+            border: 1px solid #E2E8F0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #FFF;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: none;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card" id="checkout-card">
+            <div class="logo">P</div>
+            <h1>Thanh toán Demo</h1>
+            <p>Trải nghiệm tích hợp PayOS QR Code nhanh chóng và bảo mật.</p>
+            
+            <div class="payment-info">
+                <span>Số tiền:</span>
+                <span class="amount">2,000 VND</span>
+            </div>
+
+            <button id="pay-btn">
+                <span class="loader" id="loader"></span>
+                <span id="btn-text">Thanh toán ngay</span>
+            </button>
+        </div>
+
+        <div id="payment-container"></div>
+    </div>
+
+    <script>
+        const payBtn = document.getElementById('pay-btn');
+        const btnText = document.getElementById('btn-text');
+        const loader = document.getElementById('loader');
+        const paymentContainer = document.getElementById('payment-container');
+        const checkoutCard = document.getElementById('checkout-card');
+
+        payBtn.onclick = async () => {
+            // UI States
+            payBtn.disabled = true;
+            btnText.innerText = 'Đang khởi tạo...';
+            loader.style.display = 'block';
+
+            try {
+                // 1. Call your backend to create a payment link
+                const response = await fetch('/create-payment-link', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (!response.ok) throw new Error('Failed to create payment link');
+                
+                const data = await response.json();
+                
+                if (data.checkoutUrl) {
+                    // 2. Initialize PayOS Checkout
+                    const payOSConfig = {
+                        RETURN_URL: window.location.origin + "/success.html",
+                        ELEMENT_ID: "payment-container",
+                        CHECKOUT_URL: data.checkoutUrl,
+                        embedded: true,
+                        onSuccess: (event) => {
+                            window.location.href = "/success.html";
+                        },
+                        onCancel: (event) => {
+                            console.log("User cancelled", event);
+                            alert("Bạn đã hủy thanh toán.");
+                            location.reload();
+                        },
+                        onExit: (event) => {
+                            console.log("User exited", event);
+                        }
+                    };
+
+                    // Note: In browser script, it's usually PayOSCheckout.usePayOS
+                    const { open } = PayOSCheckout.usePayOS(payOSConfig);
+                    
+                    // Show iframe container and hide the initial card
+                    paymentContainer.style.display = 'block';
+                    checkoutCard.style.display = 'none';
+                    
+                    // Open the payment interface
+                    open();
+                } else {
+                    throw new Error('No checkoutUrl received');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Lỗi: ' + error.message);
+                payBtn.disabled = false;
+                btnText.innerText = 'Thanh toán ngay';
+                loader.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>
